@@ -12,50 +12,64 @@ public class PlayerMovement2D : MonoBehaviour
     public float maxSprintTime = 3f;
     public float sprintRecoveryRate = 1.5f;
 
+    [Header("Границы и перенос по X")]
+    [Tooltip("true — при выходе за границу персонаж появляется на противоположной стороне. false — просто упирается в границу.")]
+    public bool wrapOnX = true;
+    public float minX = -400f;
+    public float maxX = 400f;
+
+    [Header("Авто-границы из фона (опционально)")]
+    [Tooltip("Перетащите сюда спрайт фона — minX/maxX возьмутся из его реальных краёв.")]
+    public SpriteRenderer background;
+    public bool autoBoundsFromBackground = false;
+
     private Rigidbody2D rb;
     private Animator anim;
     private Vector2 moveInput;
     private float currentSpeed;
     private float sprintTimer;
     private bool isSprinting;
-
-    // Переменная для хранения последнего направления (0-вниз, 1-вверх, 2-влево, 3-вправо)
     private int lastDirection = 0;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-
-        // Замораживаем вращение, чтобы физика не крутила персонажа
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+
+        // --- НОВЫЙ КОД ---
+        // Если мы вернулись из 3D, телепортируем игрока к домику
+        if (GameSession.hasSavedPosition)
+        {
+            rb.position = GameSession.savedPlayerPosition;
+            GameSession.hasSavedPosition = false; // Сбрасываем флаг, чтобы при следующем запуске игры мы начали с начала
+        }
+        // -----------------
 
         currentSpeed = 0f;
         sprintTimer = maxSprintTime;
     }
 
-    void Update()
+        void Update()
     {
-        // 1. Получаем ввод (WASD и стрелки)
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
+        float h = 0f;
+        if (Input.GetKey(KeyCode.D)) h += 1f;
+        if (Input.GetKey(KeyCode.A)) h -= 1f;
+
+        float v = 0f;
+        if (Input.GetKey(KeyCode.W)) v += 1f;
+        if (Input.GetKey(KeyCode.S)) v -= 1f;
+
         moveInput = new Vector2(h, v).normalized;
 
-        // 2. Определяем направление взгляда (если движемся)
         if (moveInput != Vector2.zero)
         {
-            // Если движемся по диагонали, приоритет отдаем той оси, куда нажали сильнее
             if (Mathf.Abs(h) > Mathf.Abs(v))
-            {
-                lastDirection = h > 0 ? 3 : 2; // 3 - вправо, 2 - влево
-            }
+                lastDirection = h > 0 ? 3 : 2;
             else
-            {
-                lastDirection = v > 0 ? 1 : 0; // 1 - вверх, 0 - вниз
-            }
+                lastDirection = v > 0 ? 1 : 0;
         }
 
-        // 3. Логика Шифта (Ускорение и таймер)
         bool shiftPressed = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
         if (shiftPressed && sprintTimer > 0f && moveInput != Vector2.zero)
@@ -76,41 +90,48 @@ public class PlayerMovement2D : MonoBehaviour
 
     void FixedUpdate()
     {
-        // 4. Меняем скорость
-        float targetSpeed = 0f;
+        float targetSpeed = (moveInput != Vector2.zero)
+            ? (isSprinting ? sprintSpeed : walkSpeed)
+            : 0f;
 
-        // Если есть ввод - задаем скорость, если нет - 0
-        if (moveInput != Vector2.zero)
-        {
-            targetSpeed = isSprinting ? sprintSpeed : walkSpeed;
-        }
-
-        // Ускорение (разгон) оставляем плавным, чтобы старт не был резким
         currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, acceleration * Time.fixedDeltaTime);
 
-        // 5. Двигаем персонажа
+        Vector2 newPos = rb.position;
+
         if (moveInput != Vector2.zero)
         {
-            rb.MovePosition(rb.position + moveInput * currentSpeed * Time.fixedDeltaTime);
+            newPos += moveInput * currentSpeed * Time.fixedDeltaTime;
         }
         else
         {
-            // МГНОВЕННО обнуляем скорость, если кнопки отпущены
-            currentSpeed = 0f;
+            currentSpeed = 0f; // Если нет ввода, сбрасываем скорость
         }
 
-        // 6. ПЕРЕДАЕМ ДАННЫЕ В ANIMATOR
+        newPos.x = ApplyXBounds(newPos.x);
+
+        rb.MovePosition(newPos);
+
         anim.SetInteger("Direction", lastDirection);
+        float animSpeed = (moveInput == Vector2.zero) ? 0f : currentSpeed / sprintSpeed;
+        anim.SetFloat("Speed", animSpeed);
+    }
 
-        // Считаем скорость для анимации
-        float animSpeed = currentSpeed / sprintSpeed;
+    // Возвращает скорректированную X: либо телепорт на другую сторону, либо жёсткий clamp
+    float ApplyXBounds(float x)
+    {
+        float width = maxX - minX;
 
-        // Если стоим на месте, принудительно шлем 0, чтобы анимация замерла
-        if (moveInput == Vector2.zero)
+        if (wrapOnX && width > 0f)
         {
-            animSpeed = 0f;
+            // Переносимся ровно на противоположный край с учётом перелёта
+            if (x > maxX) x = minX + (x - maxX);
+            else if (x < minX) x = maxX - (minX - x);
+        }
+        else
+        {
+            x = Mathf.Clamp(x, minX, maxX);
         }
 
-        anim.SetFloat("Speed", animSpeed);
+        return x;
     }
 }

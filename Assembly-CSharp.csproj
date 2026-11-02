@@ -58,9 +58,15 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.6.6f1\Editor\Data\BCLExtensions\TargetingPacks\netstandard2.1\analyzers\dotnet\roslyn4.0\cs\System.Text.Json.SourceGeneration.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\GameSession.cs" />
     <Compile Include="Assets\levelGenerator.cs" />
+    <Compile Include="Assets\Simple3DPlayer.cs" />
     <Compile Include="Assets\control.cs" />
+    <Compile Include="Assets\PlayerInteraction.cs" />
     <Compile Include="Assets\runPlayer.cs" />
+    <Compile Include="Assets\ReturnTo2D.cs" />
+    <Compile Include="Assets\HouseSpawner.cs" />
+    <Compile Include="Assets\InteractableHouse.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

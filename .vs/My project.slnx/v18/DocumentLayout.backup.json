@@ -3,8 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\user\\My project\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\user\\My project\\Assets\\runPlayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\runPlayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|c:\\users\\user\\my project\\assets\\runplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\runplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\user\\My project\\Assets\\HouseSpawner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\HouseSpawner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|c:\\users\\user\\my project\\assets\\control.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -26,7 +30,7 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "control.cs",
               "DocumentMoniker": "C:\\Users\\user\\My project\\Assets\\control.cs",
               "RelativeDocumentMoniker": "Assets\\control.cs",
@@ -34,12 +38,11 @@
               "RelativeToolTip": "Assets\\control.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAA9AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-20T03:44:10.95Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-20T03:44:10.95Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "levelGenerator.cs",
               "DocumentMoniker": "C:\\Users\\user\\My project\\Assets\\levelGenerator.cs",
               "RelativeDocumentMoniker": "Assets\\levelGenerator.cs",
@@ -47,8 +50,7 @@
               "RelativeToolTip": "Assets\\levelGenerator.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAADsAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-20T03:23:40.93Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-20T03:23:40.93Z"
             },
             {
               "$type": "Document",
@@ -58,9 +60,22 @@
               "RelativeDocumentMoniker": "Assets\\runPlayer.cs",
               "ToolTip": "C:\\Users\\user\\My project\\Assets\\runPlayer.cs",
               "RelativeToolTip": "Assets\\runPlayer.cs",
-              "ViewState": "AgIAADUAAAAAAAAAAAAkwF0AAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAF0AAAAAAAAAAAAUwHkAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-10-26T11:45:47.615Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "HouseSpawner.cs",
+              "DocumentMoniker": "C:\\Users\\user\\My project\\Assets\\HouseSpawner.cs",
+              "RelativeDocumentMoniker": "Assets\\HouseSpawner.cs",
+              "ToolTip": "C:\\Users\\user\\My project\\Assets\\HouseSpawner.cs",
+              "RelativeToolTip": "Assets\\HouseSpawner.cs",
+              "ViewState": "AgIAAAoAAAAAAAAAAAA0wCYAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-28T07:35:35.423Z",
               "EditorCaption": ""
             }
           ]
