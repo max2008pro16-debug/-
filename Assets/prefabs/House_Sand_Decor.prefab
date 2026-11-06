@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2552572940283658115}
   - component: {fileID: 3642218340310657631}
   - component: {fileID: 5149344820213225246}
-  - component: {fileID: 1061601074718290135}
   m_Layer: 0
   m_Name: House_Sand_Decor
   m_TagString: Untagged
@@ -124,7 +123,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -140,16 +139,3 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 9.37, y: 6.75}
   m_EdgeRadius: 0
---- !u!114 &1061601074718290135
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2987681846544688800}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cbf626dec26db5e49a007a5ec485d84e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InteractableHouse
-  sceneToLoad: Room3D

@@ -1,17 +1,31 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class ReturnTo2D : MonoBehaviour
 {
-    // Сюда нужно вписать ТОЧНОЕ имя вашей 2D-сцены
     public string sceneToLoad = "SampleScene";
 
     void OnTriggerEnter(Collider other)
     {
-        // Если в дверь вошел объект, у которого есть скрипт Simple3DPlayer (то есть наш игрок)
+        // 1. Пишем в консоль, что в дверь что-то влетело
+        Debug.Log("В дверь вошел объект: " + other.gameObject.name);
+
+        // 2. Проверяем, есть ли на нем скрипт игрока
         if (other.GetComponent<Simple3DPlayer>() != null)
         {
-            SceneManager.LoadScene(sceneToLoad);
+            Debug.Log("Это точно игрок! Запускаю переход...");
+
+            // 3. Проверяем, существует ли наш Fader
+            if (SceneFader.Instance != null)
+            {
+                SceneFader.Instance.FadeToScene(sceneToLoad);
+            }
+            else
+            {
+                // Если Fader не найден — выдаем ошибку
+                Debug.LogError("ОШИБКА: SceneFader не найден! Вы забыли добавить объект Fader в 3D-сцену?");
+                // На всякий случай делаем прямой переход, чтобы вы не застряли
+                UnityEngine.SceneManagement.SceneManager.LoadScene(sceneToLoad);
+            }
         }
     }
 }
