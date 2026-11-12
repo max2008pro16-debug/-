@@ -25,22 +25,12 @@ Material:
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
-    m_TexEnvs:
-    - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: 9b9031582d5001f449b6b17f66192307, type: 3}
-        m_Scale: {x: 3, y: 4}
-        m_Offset: {x: 0, y: 0}
-    - _DetailAlbedoMap:
-        m_Texture: {fileID: 2800000, guid: 9b9031582d5001f449b6b17f66192307, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 9b9031582d5001f449b6b17f66192307, type: 3}
-        m_Scale: {x: 3, y: 4}
-        m_Offset: {x: 0, y: 0}
+    m_TexEnvs: []
     m_Ints: []
     m_Floats: []
-    m_Colors: []
+    m_Colors:
+    - _BaseColor: {r: 0.1847719, g: 0.4566037, b: 0.109412566, a: 1}
+    - _Color: {r: 0.18477187, g: 0.45660365, b: 0.10941253, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &2098972015250174745
