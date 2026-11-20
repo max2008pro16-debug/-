@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D), typeof(Animator))]
 public class PlayerMovement2D : MonoBehaviour
 {
-    public bool isFrozen = false; // Блокировка движения
+    public bool isFrozen = false;
     [Header("Настройки скорости")]
     public float walkSpeed = 5f;
     public float sprintSpeed = 10f;
@@ -14,13 +14,11 @@ public class PlayerMovement2D : MonoBehaviour
     public float sprintRecoveryRate = 1.5f;
 
     [Header("Границы и перенос по X")]
-    [Tooltip("true — при выходе за границу персонаж появляется на противоположной стороне. false — просто упирается в границу.")]
     public bool wrapOnX = true;
     public float minX = -400f;
     public float maxX = 400f;
 
     [Header("Авто-границы из фона (опционально)")]
-    [Tooltip("Перетащите сюда спрайт фона — minX/maxX возьмутся из его реальных краёв.")]
     public SpriteRenderer background;
     public bool autoBoundsFromBackground = false;
 
@@ -38,20 +36,27 @@ public class PlayerMovement2D : MonoBehaviour
         anim = GetComponent<Animator>();
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
 
-        // Если мы вернулись из 3D, телепортируем игрока к домику
         if (GameSession.hasSavedPosition)
         {
             rb.position = GameSession.savedPlayerPosition;
-            GameSession.hasSavedPosition = false; // Сбрасываем флаг, чтобы при следующем запуске игры мы начали с начала
+            GameSession.hasSavedPosition = false;
         }
 
         currentSpeed = 0f;
         sprintTimer = maxSprintTime;
     }
 
-        void Update()
+    void Update()
     {
-        if (isFrozen) return; // Если заморожены, ничего не делаем
+        if (isFrozen) return;
+
+        // --- НОВАЯ СТРОКА: Возвращаем нормальный масштаб после броска ---
+        // Так как у вас есть анимации налево и направо, скейл всегда должен быть положительным
+        if (transform.localScale.x < 0)
+        {
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        }
+
         float h = 0f;
         if (Input.GetKey(KeyCode.D)) h += 1f;
         if (Input.GetKey(KeyCode.A)) h -= 1f;
@@ -90,6 +95,8 @@ public class PlayerMovement2D : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (isFrozen) return;
+
         float targetSpeed = (moveInput != Vector2.zero)
             ? (isSprinting ? sprintSpeed : walkSpeed)
             : 0f;
@@ -104,11 +111,10 @@ public class PlayerMovement2D : MonoBehaviour
         }
         else
         {
-            currentSpeed = 0f; // Если нет ввода, сбрасываем скорость
+            currentSpeed = 0f;
         }
 
         newPos.x = ApplyXBounds(newPos.x);
-
         rb.MovePosition(newPos);
 
         anim.SetInteger("Direction", lastDirection);
@@ -116,14 +122,11 @@ public class PlayerMovement2D : MonoBehaviour
         anim.SetFloat("Speed", animSpeed);
     }
 
-    // Возвращает скорректированную X: либо телепорт на другую сторону, либо жёсткий clamp
     float ApplyXBounds(float x)
     {
         float width = maxX - minX;
-
         if (wrapOnX && width > 0f)
         {
-            // Переносимся ровно на противоположный край с учётом перелёта
             if (x > maxX) x = minX + (x - maxX);
             else if (x < minX) x = maxX - (minX - x);
         }
@@ -131,7 +134,6 @@ public class PlayerMovement2D : MonoBehaviour
         {
             x = Mathf.Clamp(x, minX, maxX);
         }
-
         return x;
     }
 }

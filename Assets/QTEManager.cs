@@ -11,7 +11,7 @@ public class QTEManager : MonoBehaviour
     [Header("Настройки QTE")]
     public float timeLimit = 3f;
     public int requiredPresses = 15;
-    public float throwForce = 10f; // Сила отброса игрока
+    public float throwForce = 10f;
 
     private int currentPresses = 0;
     private float currentTime;
@@ -19,25 +19,24 @@ public class QTEManager : MonoBehaviour
 
     private PlayerHealth playerHealth;
     private GameObject monsterObject;
-    private GameObject grabVisualRef;
+    private GameObject grabVisualRef; // Объект CutsceneGrab
+    private Animator grabAnimator;    // Аниматор катсцены
 
     private SpriteRenderer playerSprite;
     private SpriteRenderer monsterSprite;
     private Rigidbody2D playerRb;
-    private MonoBehaviour playerMovementScript; // Ссылка на скрипт движения
+    private MonoBehaviour playerMovementScript;
 
     void Start()
     {
         if (qtePanel != null) qtePanel.SetActive(false);
 
-        // Находим игрока и его компоненты
         playerHealth = FindAnyObjectByType<PlayerHealth>();
         if (playerHealth != null)
         {
             playerSprite = playerHealth.GetComponent<SpriteRenderer>();
             playerRb = playerHealth.GetComponent<Rigidbody2D>();
 
-            // Пытаемся найти скрипт движения (замените PlayerMovement2D на название вашего скрипта!)
             playerMovementScript = playerHealth.GetComponent<PlayerMovement2D>();
         }
     }
@@ -46,28 +45,32 @@ public class QTEManager : MonoBehaviour
     {
         monsterObject = monster;
         grabVisualRef = grabImage;
+        grabAnimator = grabVisualRef.GetComponent<Animator>(); // Берем аниматор с CutsceneGrab
+
         isQTEActive = true;
         currentPresses = 0;
         currentTime = timeLimit;
 
-        // 1. Прячем игрока и монстра
+        // 1. Прячем отдельных игрока и монстра
         if (playerSprite != null) playerSprite.enabled = false;
         monsterSprite = monsterObject.GetComponent<SpriteRenderer>();
         if (monsterSprite != null) monsterSprite.enabled = false;
 
-        // 2. Показываем картинку захвата
-        if (grabVisualRef != null) grabVisualRef.SetActive(true);
+        // 2. Включаем катсцену (CutsceneGrab) и ставим анимацию захвата
+        if (grabVisualRef != null)
+        {
+            grabVisualRef.SetActive(true);
+            if (grabAnimator != null) grabAnimator.SetBool("IsThrowing", false); // Включает Grab_Anim
+        }
 
         // 3. Замораживаем игрока
         if (playerMovementScript != null)
         {
-            // Включаем isFrozen (если вы используете мой первый вариант)
             var field = playerMovementScript.GetType().GetField("isFrozen");
             if (field != null) field.SetValue(playerMovementScript, true);
-
-            // Если используете свой скрипт, просто напишите: playerMovementScript.enabled = false;
+            else playerMovementScript.enabled = false; // Если нет поля isFrozen
         }
-        if (playerRb != null) playerRb.linearVelocity = Vector2.zero; // Останавливаем физику
+        if (playerRb != null) playerRb.linearVelocity = Vector2.zero;
 
         // 4. Настраиваем UI
         qtePanel.SetActive(true);
@@ -99,49 +102,69 @@ public class QTEManager : MonoBehaviour
         isQTEActive = false;
         qtePanel.SetActive(false);
 
-        if (grabVisualRef != null) grabVisualRef.SetActive(false);
-
         if (success)
         {
-            Debug.Log("Игрок вырвался!");
+            Debug.Log("Игрок вырвался! Включаем бросок...");
 
-            // 1. Включаем спрайты обратно
-            if (playerSprite != null) playerSprite.enabled = true;
-            if (monsterSprite != null) monsterSprite.enabled = true;
+            // 1. ПЕРЕКЛЮЧАЕМ АНИМАЦИЮ НА БРОСОК
+            if (grabAnimator != null) grabAnimator.SetBool("IsThrowing", true);
 
-            // 2. Отнимаем здоровье и включаем анимацию полета
-            if (playerHealth != null)
-            {
-                playerHealth.TakeDamage(1);
-                playerHealth.GetComponent<Animator>().SetBool("IsThrown", true);
-
-                // 3. ФИЗИЧЕСКИЙ ОТБРОС ИГРОКА
-                if (playerRb != null && monsterObject != null)
-                {
-                    // Вычисляем направление от монстра к игроку
-                    Vector2 throwDirection = (playerHealth.transform.position - monsterObject.transform.position).normalized;
-                    // Если они стояли слишком близко, бросаем просто назад (вверх или вниз)
-                    if (throwDirection == Vector2.zero) throwDirection = Vector2.up;
-
-                    // Применяем силу
-                    playerRb.AddForce(throwDirection * throwForce, ForceMode2D.Impulse);
-                }
-
-                // Выключаем анимацию полета через 1 секунду
-                Invoke(nameof(ResetThrownAnim), 1f);
-            }
-
-            // 4. Монстр телепортируется
-            if (monsterObject != null)
-            {
-                EnemyAI enemy = monsterObject.GetComponent<EnemyAI>();
-                if (enemy != null) enemy.OnPlayerEscaped();
-            }
+            // 2. ЖДЕМ 0.5 СЕКУНДЫ (пока проигрывается анимация броска), а затем запускаем полет
+            Invoke(nameof(ExecuteThrow), 0.5f);
         }
         else
         {
             Debug.Log("Игрок не справился!");
             if (playerHealth != null) playerHealth.TakeDamage(3);
+        }
+    }
+
+    void ExecuteThrow()
+    {
+        // 1. Выключаем катсцену захвата
+        if (grabVisualRef != null) grabVisualRef.SetActive(false);
+
+        // 2. Включаем спрайты игрока и монстра
+        if (playerSprite != null) playerSprite.enabled = true;
+        if (monsterSprite != null) monsterSprite.enabled = true;
+
+        // 3. Игрок теряет здоровье, включается анимация полета и физический отброс
+        if (playerHealth != null)
+        {
+            playerHealth.TakeDamage(1);
+            playerHealth.GetComponent<Animator>().SetBool("IsThrown", true);
+
+            if (playerRb != null && monsterObject != null)
+            {
+                Vector2 throwDirection = (playerHealth.transform.position - monsterObject.transform.position).normalized;
+                if (throwDirection == Vector2.zero) throwDirection = Vector2.up;
+
+                // Берем текущий размер игрока (например, 0.43)
+                float originalScaleX = Mathf.Abs(playerHealth.transform.localScale.x);
+
+                if (throwDirection.x > 0)
+                {
+                    // Летим вправо
+                    playerHealth.transform.localScale = new Vector3(originalScaleX, playerHealth.transform.localScale.y, playerHealth.transform.localScale.z);
+                }
+                else if (throwDirection.x < 0)
+                {
+                    // Летим влево
+                    playerHealth.transform.localScale = new Vector3(-originalScaleX, playerHealth.transform.localScale.y, playerHealth.transform.localScale.z);
+                }
+
+                playerRb.AddForce(throwDirection * throwForce, ForceMode2D.Impulse);
+            }
+
+            // Через 1 секунду выключаем анимацию полета и размораживаем игрока
+            Invoke(nameof(ResetThrownAnim), 1f);
+        }
+
+        // 4. Монстр телепортируется
+        if (monsterObject != null)
+        {
+            EnemyAI enemy = monsterObject.GetComponent<EnemyAI>();
+            if (enemy != null) enemy.OnPlayerEscaped();
         }
     }
 
@@ -151,12 +174,12 @@ public class QTEManager : MonoBehaviour
         {
             playerHealth.GetComponent<Animator>().SetBool("IsThrown", false);
 
-            // РАЗМОРАЖИВАЕМ ИГРОКА (возвращаем управление)
+            // РАЗМОРАЖИВАЕМ ИГРОКА
             if (playerMovementScript != null)
             {
                 var field = playerMovementScript.GetType().GetField("isFrozen");
                 if (field != null) field.SetValue(playerMovementScript, false);
-                // Или: playerMovementScript.enabled = true;
+                else playerMovementScript.enabled = true;
             }
         }
     }

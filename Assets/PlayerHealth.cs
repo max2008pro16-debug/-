@@ -6,9 +6,13 @@ public class PlayerHealth : MonoBehaviour
     public int maxHealth = 3;
     public int currentHealth;
 
+    [Header("UI")]
+    public GameObject gameOverPanel; // Сюда перетащим панель
+
     void Start()
     {
         currentHealth = maxHealth;
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
     }
 
     public void TakeDamage(int damage)
@@ -25,7 +29,19 @@ public class PlayerHealth : MonoBehaviour
     void Die()
     {
         Debug.Log("Игрок умер!");
-        // Перезапуск сцены (или экран Game Over)
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true); // Показываем экран смерти
+
+            // Останавливаем время (по желанию)
+            // Time.timeScale = 0f; 
+        }
+    }
+
+    // Этот метод мы повесим на кнопку "Попробовать снова"
+    public void RestartGame()
+    {
+        // Time.timeScale = 1f; 
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
